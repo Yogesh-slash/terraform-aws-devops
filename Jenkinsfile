@@ -20,11 +20,15 @@ pipeline {
             }
         }
 
-        stage('Terraform Version') {
+        stage('Terraform Debug') {
             steps {
-                sh 'terraform version'
+                sh 'whoami'
+                sh 'pwd'
+                sh 'echo $PATH'
+                sh 'which terraform || true'
+                sh 'ls -l /usr/local/bin/terraform || true'
+                sh 'terraform version || true'
             }
         }
-
     }
 }
