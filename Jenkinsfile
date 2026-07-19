@@ -42,6 +42,21 @@ pipeline {
             steps {
                 sh 'terraform apply -auto-approve'
             }
-        } 
+        }
+
+        stage('Verify Infrastructure') {
+            steps {
+                sh 'echo "===== Terraform Outputs ====="'
+                sh 'terraform output || true'
+
+                sh 'echo "===== EC2 Instances ====="'
+                sh '''
+                aws ec2 describe-instances \
+                --region ap-southeast-2 \
+                --query "Reservations[*].Instances[*].[Tags[?Key==`Name`].Value|[0],InstanceId,State.Name,PublicIpAddress]" \
+                --output table
+                '''
+            }
+        }
     }
 }
