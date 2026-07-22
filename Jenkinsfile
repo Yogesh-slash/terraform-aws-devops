@@ -44,13 +44,41 @@ pipeline {
             }
         }
 
+        stage('Generate Ansible Inventory') {
+            steps {
+                sh '''
+                mkdir -p ansible/inventory
+
+                PUBLIC_IP=$(terraform output -raw ec2_public_ip)
+
+                echo "[web]" > ansible/inventory/inventory.ini
+                echo "$PUBLIC_IP ansible_user=ubuntu" >> ansible/inventory/inventory.ini
+
+                echo "===== Inventory File ====="
+                cat ansible/inventory/inventory.ini
+                '''
+            }
+        }
+
+        stage('Test Ansible Connection') {
+            steps {
+                sshagent(credentials: ['ansible-key']) {
+                    dir('ansible') {
+                        sh '''
+                        ansible all -m ping
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Verify Infrastructure') {
             steps {
-            sh 'echo "===== Terraform Outputs ====="'
-            sh 'terraform output'
+                sh 'echo "===== Terraform Outputs ====="'
+                sh 'terraform output'
 
-            sh 'echo "===== EC2 Instances ====="'
-            sh 'aws ec2 describe-instances --region ap-southeast-2 --output table'
+                sh 'echo "===== EC2 Instances ====="'
+                sh 'aws ec2 describe-instances --region ap-southeast-2 --output table'
             }
         }
     }
