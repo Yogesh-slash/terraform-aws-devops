@@ -1,9 +1,10 @@
 ---
-- name: Install and Start Nginx
+- name: Install and Configure Nginx
   hosts: all
   become: true
 
   tasks:
+
     - name: Update apt package cache
       apt:
         update_cache: yes
@@ -22,3 +23,11 @@
       service:
         name: nginx
         state: started
+
+    - name: Copy Website to Nginx
+      copy:
+        src: ../website/index.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'

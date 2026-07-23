@@ -63,11 +63,11 @@ pipeline {
         stage('Configure EC2 with Ansible') {
             steps {
                 sshagent(credentials: ['ansible-key']) {
-                    dir('ansible') {
-                        sh '''
-                        ansible-playbook playbooks/install-nginx.yml
-                        '''
-                    }
+            
+                    sh '''
+                    ansible-playbook -i ansible/inventory/inventory.ini ansible/playbooks/install-nginx.yml
+                    '''
+                    
                 }
             }
         }
