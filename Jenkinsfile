@@ -60,12 +60,12 @@ pipeline {
             }
         }
 
-        stage('Test Ansible Connection') {
+        stage('Configure EC2 with Ansible') {
             steps {
                 sshagent(credentials: ['ansible-key']) {
                     dir('ansible') {
                         sh '''
-                        ansible all -m ping
+                        ansible-playbook playbooks/install-nginx.yml
                         '''
                     }
                 }
